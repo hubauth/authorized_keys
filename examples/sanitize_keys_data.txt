@@ -1,0 +1,12 @@
+# this is a sample file showing the process of removing all "human
+# readable information", for whatever purposes.
+
+ssh-rsa AAAAuQ== here are
+ssh-rsa AAAAp14R some details
+# here's a comment about the following keys
+ssh-rsa AAAAziqt for humans to read
+
+ssh-rsa AAAA4QOp or non-humans, I guess
+ssh-rsa AAAA2pSz just probably not raw
+
+ssh-rsa AAAAjQ== CPUs

@@ -1,0 +1,30 @@
+key_type = @{ "ecdsa-sha2-nistp256" | "ecdsa-sha2-nistp384" | "ecdsa-sha2-nistp521" | "ssh-ed25519" | "ssh-dss" | "ssh-rsa" }
+encoded_key = @{ _base64_string }
+key = { key_type ~ encoded_key }
+
+option_name = @{ _ident }
+option_value = @{ _string }
+option = ${ option_name ~ "=" ~ option_value | option_name }
+options = ${ option ~ ("," ~ option)* }
+
+key_comment = @{ _to_eol }
+
+key_line = { (&(key) ~ key | options ~ key) ~ key_comment? }
+comment_line = @{ ("#" ~ _to_eol | WHITESPACE* ) }
+
+key_file = { SOI ~ (comment_line ~ EOL | key_line ~ EOL)* ~ EOI }
+
+
+
+WHITESPACE = _{" "}
+EOL = _{NEWLINE}
+
+_string = @{ "\"" ~ _string_char* ~ "\"" }
+_string_char = @{!("\"" | "\\") ~ ANY | "\\" ~ ("\"" | "\\")}
+
+// TODO: handle base64 length checks?
+_base64_string = @{ (ASCII_ALPHANUMERIC | "+" | "/")+ ~ "="{0,2} }
+
+_ident = @{ ASCII_ALPHANUMERIC ~ (ASCII_ALPHANUMERIC | "-")* }
+
+_to_eol = @{ !(EOL) ~ ANY ~ (!(EOL) ~ ANY)* }
