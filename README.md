@@ -2,13 +2,13 @@
 
 Parse and manipulate OpenSSH `authorized_keys` files.
 
-[![AppVeyor](https://img.shields.io/appveyor/ci/liamdawson/authorized_keys.svg?label=Windows%20builds&style=flat-square)](https://ci.appveyor.com/project/liamdawson/authorized-keys)
-[![Travis](https://img.shields.io/travis/com/hubauth/authorized_keys.svg?style=flat-square)](https://travis-ci.com/hubauth/authorized_keys)
-[![Crates.io](https://img.shields.io/crates/v/authorized_keys.svg?style=flat-square)](https://crates.io/crates/authorized_keys)
+[![Windows Build Status](https://ci.appveyor.com/api/projects/status/gm7dto6llk0mgrsr?svg=true)](https://ci.appveyor.com/project/liamdawson/authorized-keys)
+[![Build Status](https://travis-ci.com/hubauth/authorized_keys.svg?branch=master)](https://travis-ci.com/hubauth/authorized_keys)
+[![Crates.io](https://img.shields.io/crates/v/authorized_keys.svg)](https://crates.io/crates/authorized_keys)
 
-  [Contributing](./CONTRIBUTING.md)
-| [Code of Conduct](./CODE_OF_CONDUCT.md)
-| [Examples](./examples/)
+  [Contributing](https://github.com/hubauth/authorized_keys/CONTRIBUTING.md)
+| [Code of Conduct](https://github.com/hubauth/authorized_keys/CODE_OF_CONDUCT.md)
+| [Examples](https://github.com/hubauth/authorized_keys/examples/)
 
 ## Installation
 
