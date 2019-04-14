@@ -1,4 +1,4 @@
-# authorized_keys-rs
+# authorized_keys
 
 Parse and manipulate OpenSSH `authorized_keys` files.
 
