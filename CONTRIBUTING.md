@@ -18,8 +18,9 @@ Particularly welcomed:
     * Check for duplicates first :slightly_smiling_face:
 1. Fork the repository, make your changes on a branch
 1. Add tests for new features
-1. Ensure `just check` passes locally
+1. Ensure `just check` and `just test` pass locally
 1. Open a PR for the changes
     * Add yourself as an author to `Cargo.toml` and `README.md`, if you'd like!
 
 [pest]: https://pest.rs
+[rustup]: https://rustup.rs/
