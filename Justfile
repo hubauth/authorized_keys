@@ -1,17 +1,17 @@
-check: check-fmt check-tests check-clippy check-docs
+test:
+    cargo test --verbose
+    cargo test --verbose --features "key_encoding"
+
+check: check-fmt check-clippy check-docs
 
 check-fmt:
-    cargo fmt -- --check
-
-check-tests:
-    cargo test
-    cargo test --features "key_encoding"
+    cargo fmt -- --verbose --check
 
 check-clippy:
-    cargo clippy --all-targets --all-features -- -D warnings
+    cargo clippy --verbose --all-targets --all-features -- --verbose -D warnings
 
 check-docs:
-    cargo doc
+    cargo doc --verbose
 
 fix: fix-fmt
 
