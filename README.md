@@ -6,9 +6,9 @@ Parse and manipulate OpenSSH `authorized_keys` files.
 [![Build Status](https://travis-ci.com/hubauth/authorized_keys.svg?branch=master)](https://travis-ci.com/hubauth/authorized_keys)
 [![Crates.io](https://img.shields.io/crates/v/authorized_keys.svg)](https://crates.io/crates/authorized_keys)
 
-  [Contributing](https://github.com/hubauth/authorized_keys/CONTRIBUTING.md)
-| [Code of Conduct](https://github.com/hubauth/authorized_keys/CODE_OF_CONDUCT.md)
-| [Examples](https://github.com/hubauth/authorized_keys/examples/)
+  [Contributing](./CONTRIBUTING.md)
+| [Code of Conduct](./CODE_OF_CONDUCT.md)
+| [Examples](./examples/)
 
 ## Installation
 
