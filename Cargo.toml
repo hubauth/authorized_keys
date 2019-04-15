@@ -20,3 +20,10 @@ data-encoding = { version = "2.1", optional = true }
 default = ['parse']
 parse = ['pest', 'pest_derive']
 key_encoding = ['data-encoding']
+
+[dev-dependencies]
+criterion = "0.2"
+
+[[bench]]
+name = "parsing"
+harness = false
