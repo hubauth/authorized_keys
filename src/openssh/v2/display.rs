@@ -1,6 +1,29 @@
 use super::constants::*;
-use super::models::{KeyAuthorization, KeyType, KeysFile, KeysFileLine};
+use super::models::{KeyAuthorization, KeyType, KeysFile, KeysFileLine, PublicKey};
 use std::fmt::{Display, Error, Formatter};
+
+impl Display for KeyType {
+    fn fmt(&self, f: &mut Formatter) -> Result<(), Error> {
+        write!(
+            f,
+            "{}",
+            match self {
+                KeyType::EcdsaSha2Nistp256 => ECDSA_SHA2_NISTP256,
+                KeyType::EcdsaSha2Nistp384 => ECDSA_SHA2_NISTP384,
+                KeyType::EcdsaSha2Nistp521 => ECDSA_SHA2_NISTP521,
+                KeyType::SshEd25519 => SSH_ED25519,
+                KeyType::SshDss => SSH_DSS,
+                KeyType::SshRsa => SSH_RSA,
+            }
+        )
+    }
+}
+
+impl Display for PublicKey {
+    fn fmt(&self, f: &mut Formatter) -> Result<(), Error> {
+        write!(f, "{} {}", self.key_type, self.encoded_key)
+    }
+}
 
 impl Display for KeyAuthorization {
     fn fmt(&self, f: &mut Formatter) -> Result<(), Error> {
@@ -9,7 +32,7 @@ impl Display for KeyAuthorization {
         if !options.is_empty() {
             write!(f, "{} ", options)?;
         }
-        write!(f, "{}", self.key_def())?;
+        write!(f, "{}", self.key)?;
         if !self.comments.trim().is_empty() {
             write!(f, " {}", self.comments.trim())?;
         }
@@ -31,33 +54,17 @@ impl Display for KeysFile {
     }
 }
 
-impl Display for KeyType {
-    fn fmt(&self, f: &mut Formatter) -> Result<(), Error> {
-        write!(
-            f,
-            "{}",
-            match self {
-                KeyType::EcdsaSha2Nistp256 => ECDSA_SHA2_NISTP256,
-                KeyType::EcdsaSha2Nistp384 => ECDSA_SHA2_NISTP384,
-                KeyType::EcdsaSha2Nistp521 => ECDSA_SHA2_NISTP521,
-                KeyType::SshEd25519 => SSH_ED25519,
-                KeyType::SshDss => SSH_DSS,
-                KeyType::SshRsa => SSH_RSA,
-            }
-        )
-    }
-}
-
 #[cfg(test)]
 mod tests {
-    use super::{KeyAuthorization, KeyType};
+    use super::{KeyAuthorization, KeyType, PublicKey};
 
     #[test]
     fn it_writes_a_key() {
         let mut subject = KeyAuthorization::default();
-        subject.key_type = KeyType::SshEd25519;
-        subject.encoded_key =
-            "AAAAC3NzaC1lZDI1NTE5AAAAIGgqo1o+dOHqeIc7A5MG53s5iYwpMQm7f3hnn+uxtHUM".to_owned();
+        subject.key = PublicKey::new(
+            KeyType::SshEd25519,
+            "AAAAC3NzaC1lZDI1NTE5AAAAIGgqo1o+dOHqeIc7A5MG53s5iYwpMQm7f3hnn+uxtHUM".to_owned(),
+        );
 
         assert_eq!(
             &subject.to_string(),
@@ -68,9 +75,10 @@ mod tests {
     #[test]
     fn it_writes_a_key_with_comments() {
         let mut subject = KeyAuthorization::default();
-        subject.key_type = KeyType::SshEd25519;
-        subject.encoded_key =
-            "AAAAC3NzaC1lZDI1NTE5AAAAIGgqo1o+dOHqeIc7A5MG53s5iYwpMQm7f3hnn+uxtHUM".to_owned();
+        subject.key = PublicKey::new(
+            KeyType::SshEd25519,
+            "AAAAC3NzaC1lZDI1NTE5AAAAIGgqo1o+dOHqeIc7A5MG53s5iYwpMQm7f3hnn+uxtHUM".to_owned(),
+        );
         subject.comments = " the quick brown fox jumped over the lazy dog   ".to_owned();
 
         assert_eq!(&subject.to_string(), "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIGgqo1o+dOHqeIc7A5MG53s5iYwpMQm7f3hnn+uxtHUM the quick brown fox jumped over the lazy dog");
@@ -82,9 +90,10 @@ mod tests {
         subject
             .options
             .push(("no-agent-forwarding".to_owned(), None));
-        subject.key_type = KeyType::SshEd25519;
-        subject.encoded_key =
-            "AAAAC3NzaC1lZDI1NTE5AAAAIGgqo1o+dOHqeIc7A5MG53s5iYwpMQm7f3hnn+uxtHUM".to_owned();
+        subject.key = PublicKey::new(
+            KeyType::SshEd25519,
+            "AAAAC3NzaC1lZDI1NTE5AAAAIGgqo1o+dOHqeIc7A5MG53s5iYwpMQm7f3hnn+uxtHUM".to_owned(),
+        );
 
         assert_eq!(&subject.to_string(), "no-agent-forwarding ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIGgqo1o+dOHqeIc7A5MG53s5iYwpMQm7f3hnn+uxtHUM");
     }
@@ -106,9 +115,10 @@ mod tests {
             "environment".to_owned(),
             Some("LOGNAME=ssh-user".to_owned()),
         ));
-        subject.key_type = KeyType::SshEd25519;
-        subject.encoded_key =
-            "AAAAC3NzaC1lZDI1NTE5AAAAIGgqo1o+dOHqeIc7A5MG53s5iYwpMQm7f3hnn+uxtHUM".to_owned();
+        subject.key = PublicKey::new(
+            KeyType::SshEd25519,
+            "AAAAC3NzaC1lZDI1NTE5AAAAIGgqo1o+dOHqeIc7A5MG53s5iYwpMQm7f3hnn+uxtHUM".to_owned(),
+        );
         subject.comments = "this is a more complex example".to_owned();
 
         assert_eq!(&subject.to_string(), "no-agent-forwarding,command=\"echo \\\"Hello, world!\\\"\",environment=\"PATH=/bin:/sbin\",environment=\"LOGNAME=ssh-user\" ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIGgqo1o+dOHqeIc7A5MG53s5iYwpMQm7f3hnn+uxtHUM this is a more complex example");

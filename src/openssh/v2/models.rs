@@ -1,3 +1,5 @@
+#[doc(inline)]
+pub use super::constants::KeyType;
 use std::iter::FromIterator;
 
 /// A key or key/value token which set parameters on the way the
@@ -16,26 +18,22 @@ pub type KeyOption = (String, Option<String>);
 /// `AuthorizedKey`.
 pub type KeyOptions = Vec<KeyOption>;
 
-/// Represents the key type of an authorized public key
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum KeyType {
-    /// `ecdsa-sha2-nistp256`
-    EcdsaSha2Nistp256,
-    /// `ecdsa-sha2-nistp384`
-    EcdsaSha2Nistp384,
-    /// `ecdsa-sha2-nistp521`
-    EcdsaSha2Nistp521,
-    /// `ssh-ed25519`
-    SshEd25519,
-    /// `ssh-dss` (for DSA)
-    SshDss,
-    /// `ssd-rsa`
-    SshRsa,
+/// Represents a public key for authorization
+#[derive(Debug, Default, Clone, PartialEq, Eq)]
+pub struct PublicKey {
+    /// Type of key (e.g. `ssh-rsa` -> `AuthorizedKeyType::SshRsa`)
+    pub key_type: KeyType,
+    /// Public key data, base64 encoded
+    pub encoded_key: String,
 }
 
-impl Default for KeyType {
-    fn default() -> Self {
-        KeyType::SshRsa
+impl PublicKey {
+    /// Create a representation of a public key
+    pub fn new(key_type: KeyType, encoded_key: String) -> Self {
+        Self {
+            key_type,
+            encoded_key,
+        }
     }
 }
 
@@ -45,10 +43,8 @@ impl Default for KeyType {
 pub struct KeyAuthorization {
     /// Options applied to the key
     pub options: KeyOptions,
-    /// Type of key (e.g. `ssh-rsa` -> `AuthorizedKeyType::SshRsa`)
-    pub key_type: KeyType,
-    /// Public key, base64 encoded
-    pub encoded_key: String,
+    /// Public key type and data
+    pub key: PublicKey,
     /// Comments written at the end of the `authorized_keys` line
     pub comments: String,
 }

@@ -1,5 +1,7 @@
 use super::constants::*;
-use super::models::{KeyAuthorization, KeyOption, KeyOptions, KeyType, KeysFile, KeysFileLine};
+use super::models::{
+    KeyAuthorization, KeyOption, KeyOptions, KeyType, KeysFile, KeysFileLine, PublicKey,
+};
 use std::str::FromStr;
 
 impl FromStr for KeyType {
@@ -195,8 +197,7 @@ impl KeyLineParser {
             Some(key_type) => match encoded_key {
                 Some(encoded_key) => Ok(KeyAuthorization {
                     options: Self::parse_options(options),
-                    key_type,
-                    encoded_key,
+                    key: PublicKey::new(key_type, encoded_key),
                     comments,
                 }),
                 _ => Err("could not parse encoded key".to_owned()),
@@ -246,10 +247,10 @@ mod tests {
 
         let key = KeyAuthorization::from_str(key_str).expect("should parse key successfully");
 
-        assert_eq!(KeyType::SshEd25519, key.key_type);
+        assert_eq!(KeyType::SshEd25519, key.key.key_type);
         assert_eq!(
             "AAAAC3NzaC1lZDI1NTE5AAAAIGgqo1o+dOHqeIc7A5MG53s5iYwpMQm7f3hnn+uxtHUM",
-            key.encoded_key
+            key.key.encoded_key
         );
     }
 
@@ -308,8 +309,8 @@ mod tests {
             key.options
         );
 
-        assert_eq!(KeyType::SshEd25519, key.key_type);
-        assert_eq!("AAAAtHUM", key.encoded_key);
+        assert_eq!(KeyType::SshEd25519, key.key.key_type);
+        assert_eq!("AAAAtHUM", key.key.encoded_key);
         assert_eq!("comment value here", key.comments);
     }
 
@@ -326,8 +327,7 @@ mod tests {
         let file: &str = "ssh-ed25519 AAAAtHUM";
         let expected: Vec<KeysFileLine> = vec![KeysFileLine::Key(KeyAuthorization {
             options: KeyOptions::default(),
-            key_type: KeyType::SshEd25519,
-            encoded_key: "AAAAtHUM".to_owned(),
+            key: PublicKey::new(KeyType::SshEd25519, "AAAAtHUM".to_owned()),
             comments: "".to_owned(),
         })];
 
@@ -342,8 +342,7 @@ mod tests {
             KeysFileLine::Comment("".to_owned()),
             KeysFileLine::Key(KeyAuthorization {
                 options: KeyOptions::default(),
-                key_type: KeyType::SshEd25519.to_owned(),
-                encoded_key: "AAAAtHUM".to_owned(),
+                key: PublicKey::new(KeyType::SshEd25519, "AAAAtHUM".to_owned()),
                 comments: "".to_owned(),
             }),
         ];
