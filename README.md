@@ -26,16 +26,16 @@ authorized_keys = "0.9"
 * Change the parts of a line (options, key type, encoded key, comments)
   with convenience methods
 * Write `authorized_keys` files in the correct format
-* Depends on [`pest`], (and `pest_derive`) by default:
-  * [`data-encoding`] if you want to edit keys as bytes
-  * No dependencies if you disable the default `parsing` feature
+* No dependencies by default
+  * Depends on [`data-encoding`] if you want to edit key data as bytes
 
 ## Roadmap
 
 ### 1.0
 
 * [ ] more significant testing
-* [ ] benchmarks
+* [x] benchmarks
+* [ ] validated benchmarks
 
 ## Authors
 
@@ -48,5 +48,4 @@ Apache License (Version 2.0).
 
 See [LICENSE-APACHE](LICENSE-APACHE) and [LICENSE-MIT](LICENSE-MIT) for details.
 
-[`pest`]: https://pest.rs
 [`data-encoding`]: https://github.com/ia0/data-encoding
