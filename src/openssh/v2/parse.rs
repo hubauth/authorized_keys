@@ -57,8 +57,7 @@ impl KeyLinePartParser {
     }
 }
 
-struct KeyLineParser {}
-impl KeyLineParser {
+impl KeyAuthorization {
     fn parse_option_value(input: Option<String>) -> Option<String> {
         if let Some(mut val) = input {
             if let Some(to) = val.len().checked_sub(1) {
@@ -136,7 +135,7 @@ impl KeyLineParser {
         }
     }
 
-    fn parse(s: &str) -> Result<KeyAuthorization, String> {
+    fn parse(s: &str) -> Result<Self, String> {
         let mut chars = s.chars().peekable();
         let mut part_parser = KeyLinePartParser::new(' ');
         let mut current_part: Vec<char> = Vec::with_capacity(1024);
@@ -195,7 +194,7 @@ impl KeyLineParser {
 
         match key_type {
             Some(key_type) => match encoded_key {
-                Some(encoded_key) => Ok(KeyAuthorization {
+                Some(encoded_key) => Ok(Self {
                     options: Self::parse_options(options),
                     key: PublicKey::new(key_type, encoded_key),
                     comments,
@@ -211,7 +210,7 @@ impl FromStr for KeyAuthorization {
     type Err = String;
 
     fn from_str(s: &str) -> Result<Self, Self::Err> {
-        KeyLineParser::parse(s)
+        Self::parse(s)
     }
 }
 
@@ -225,7 +224,7 @@ impl FromStr for KeysFile {
             if line.starts_with('#') || line.chars().all(|c| c.is_ascii_whitespace()) {
                 lines.push(KeysFileLine::Comment(line.to_owned()));
             } else {
-                match KeyLineParser::parse(line) {
+                match KeyAuthorization::parse(line) {
                     Ok(key) => lines.push(KeysFileLine::Key(key)),
                     Err(e) => return Err(format!("parsing failed on line {}: {}", i, e)),
                 }
