@@ -29,12 +29,12 @@ impl AuthorizedKey {
 
 #[cfg(test)]
 mod tests {
-    use super::AuthorizedKey;
+    use super::{AuthorizedKey, AuthorizedKeyType};
 
     #[test]
     fn it_gets_key_def() {
         let mut subject = AuthorizedKey::default();
-        subject.key_type = "ecdsa-sha2-nistp256".to_owned();
+        subject.key_type = AuthorizedKeyType::EcdsaSha2Nistp256;
         subject.encoded_key = "morevalidbase64please+==".to_owned();
 
         assert_eq!(
