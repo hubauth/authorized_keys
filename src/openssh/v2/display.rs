@@ -1,8 +1,8 @@
 use super::constants::*;
-use super::models::{AuthorizedKey, AuthorizedKeyType, AuthorizedKeysFile, AuthorizedKeysFileLine};
+use super::models::{KeyAuthorization, KeyType, KeysFile, KeysFileLine};
 use std::fmt::{Display, Error, Formatter};
 
-impl Display for AuthorizedKey {
+impl Display for KeyAuthorization {
     fn fmt(&self, f: &mut Formatter) -> Result<(), Error> {
         let options = self.options_string();
 
@@ -18,12 +18,12 @@ impl Display for AuthorizedKey {
     }
 }
 
-impl Display for AuthorizedKeysFile {
+impl Display for KeysFile {
     fn fmt(&self, f: &mut Formatter) -> Result<(), Error> {
         for line in &self.lines {
             match line {
-                AuthorizedKeysFileLine::Comment(val) => writeln!(f, "{}", val)?,
-                AuthorizedKeysFileLine::AuthorizedKey(val) => writeln!(f, "{}", val)?,
+                KeysFileLine::Comment(val) => writeln!(f, "{}", val)?,
+                KeysFileLine::Key(val) => writeln!(f, "{}", val)?,
             }
         }
 
@@ -31,18 +31,18 @@ impl Display for AuthorizedKeysFile {
     }
 }
 
-impl Display for AuthorizedKeyType {
+impl Display for KeyType {
     fn fmt(&self, f: &mut Formatter) -> Result<(), Error> {
         write!(
             f,
             "{}",
             match self {
-                AuthorizedKeyType::EcdsaSha2Nistp256 => ECDSA_SHA2_NISTP256,
-                AuthorizedKeyType::EcdsaSha2Nistp384 => ECDSA_SHA2_NISTP384,
-                AuthorizedKeyType::EcdsaSha2Nistp521 => ECDSA_SHA2_NISTP521,
-                AuthorizedKeyType::SshEd25519 => SSH_ED25519,
-                AuthorizedKeyType::SshDss => SSH_DSS,
-                AuthorizedKeyType::SshRsa => SSH_RSA,
+                KeyType::EcdsaSha2Nistp256 => ECDSA_SHA2_NISTP256,
+                KeyType::EcdsaSha2Nistp384 => ECDSA_SHA2_NISTP384,
+                KeyType::EcdsaSha2Nistp521 => ECDSA_SHA2_NISTP521,
+                KeyType::SshEd25519 => SSH_ED25519,
+                KeyType::SshDss => SSH_DSS,
+                KeyType::SshRsa => SSH_RSA,
             }
         )
     }
@@ -50,12 +50,12 @@ impl Display for AuthorizedKeyType {
 
 #[cfg(test)]
 mod tests {
-    use super::{AuthorizedKey, AuthorizedKeyType};
+    use super::{KeyAuthorization, KeyType};
 
     #[test]
     fn it_writes_a_key() {
-        let mut subject = AuthorizedKey::default();
-        subject.key_type = AuthorizedKeyType::SshEd25519;
+        let mut subject = KeyAuthorization::default();
+        subject.key_type = KeyType::SshEd25519;
         subject.encoded_key =
             "AAAAC3NzaC1lZDI1NTE5AAAAIGgqo1o+dOHqeIc7A5MG53s5iYwpMQm7f3hnn+uxtHUM".to_owned();
 
@@ -67,8 +67,8 @@ mod tests {
 
     #[test]
     fn it_writes_a_key_with_comments() {
-        let mut subject = AuthorizedKey::default();
-        subject.key_type = AuthorizedKeyType::SshEd25519;
+        let mut subject = KeyAuthorization::default();
+        subject.key_type = KeyType::SshEd25519;
         subject.encoded_key =
             "AAAAC3NzaC1lZDI1NTE5AAAAIGgqo1o+dOHqeIc7A5MG53s5iYwpMQm7f3hnn+uxtHUM".to_owned();
         subject.comments = " the quick brown fox jumped over the lazy dog   ".to_owned();
@@ -78,11 +78,11 @@ mod tests {
 
     #[test]
     fn it_writes_a_key_with_an_option() {
-        let mut subject = AuthorizedKey::default();
+        let mut subject = KeyAuthorization::default();
         subject
             .options
             .push(("no-agent-forwarding".to_owned(), None));
-        subject.key_type = AuthorizedKeyType::SshEd25519;
+        subject.key_type = KeyType::SshEd25519;
         subject.encoded_key =
             "AAAAC3NzaC1lZDI1NTE5AAAAIGgqo1o+dOHqeIc7A5MG53s5iYwpMQm7f3hnn+uxtHUM".to_owned();
 
@@ -91,7 +91,7 @@ mod tests {
 
     #[test]
     fn it_writes_a_complex_key() {
-        let mut subject = AuthorizedKey::default();
+        let mut subject = KeyAuthorization::default();
         subject
             .options
             .push(("no-agent-forwarding".to_owned(), None));
@@ -106,7 +106,7 @@ mod tests {
             "environment".to_owned(),
             Some("LOGNAME=ssh-user".to_owned()),
         ));
-        subject.key_type = AuthorizedKeyType::SshEd25519;
+        subject.key_type = KeyType::SshEd25519;
         subject.encoded_key =
             "AAAAC3NzaC1lZDI1NTE5AAAAIGgqo1o+dOHqeIc7A5MG53s5iYwpMQm7f3hnn+uxtHUM".to_owned();
         subject.comments = "this is a more complex example".to_owned();

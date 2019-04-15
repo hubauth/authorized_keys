@@ -1,4 +1,4 @@
-use super::models::*;
+use super::models::{KeyAuthorization, KeyOption, KeyType};
 #[cfg(feature = "key_encoding")]
 use data_encoding::BASE64;
 
@@ -6,7 +6,7 @@ fn basic_escape(val: &str) -> String {
     val.replace("\\", "\\\\").replace("\"", "\\\"").to_owned()
 }
 
-impl AuthorizedKey {
+impl KeyAuthorization {
     /// Adds a `KeyOption` to the key's options, without escaping the
     /// value.
     pub fn raw_option(mut self, option: KeyOption) -> Self {
@@ -71,7 +71,7 @@ impl AuthorizedKey {
     }
 
     /// Sets the key type to the provided value.
-    pub fn key_type(mut self, val: AuthorizedKeyType) -> Self {
+    pub fn key_type(mut self, val: KeyType) -> Self {
         self.key_type = val;
 
         self
@@ -94,11 +94,11 @@ impl AuthorizedKey {
 
 #[cfg(test)]
 mod tests {
-    use super::{AuthorizedKey, AuthorizedKeyType};
+    use super::{KeyAuthorization, KeyType};
 
     #[test]
     fn it_adds_options() {
-        let subject = AuthorizedKey::default()
+        let subject = KeyAuthorization::default()
             .option((
                 "command".to_owned(),
                 Some(r#"echo "hello, world!""#.to_owned()),
@@ -117,7 +117,7 @@ mod tests {
 
     #[test]
     fn it_removes_options() {
-        let mut subject = AuthorizedKey::default();
+        let mut subject = KeyAuthorization::default();
         subject.options = vec![
             ("foo".to_owned(), Some("bar".to_owned())),
             ("foo".to_owned(), Some("baz".to_owned())),
@@ -154,7 +154,7 @@ mod tests {
 
     #[test]
     fn it_edits_comments() {
-        let subject = AuthorizedKey::default().comments("test".to_owned());
+        let subject = KeyAuthorization::default().comments("test".to_owned());
 
         assert_eq!("test", subject.comments);
         assert_eq!("", subject.remove_comments().comments);
@@ -162,11 +162,11 @@ mod tests {
 
     #[test]
     fn it_sets_key_parameters() {
-        let subject = AuthorizedKey::default()
-            .key_type(AuthorizedKeyType::SshRsa)
+        let subject = KeyAuthorization::default()
+            .key_type(KeyType::SshRsa)
             .encoded_key("thisisvalidbase64/==".to_owned());
 
-        assert_eq!(AuthorizedKeyType::SshRsa, subject.key_type);
+        assert_eq!(KeyType::SshRsa, subject.key_type);
         assert_eq!("thisisvalidbase64/==", subject.encoded_key);
     }
 
@@ -178,7 +178,7 @@ mod tests {
 
         assert_eq!(
             data_str,
-            AuthorizedKey::default().key_from_bytes(data).encoded_key
+            KeyAuthorization::default().key_from_bytes(data).encoded_key
         );
     }
 }

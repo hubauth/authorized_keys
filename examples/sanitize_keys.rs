@@ -9,18 +9,15 @@ use std::str::FromStr;
 const SAMPLE_FILE: &str = include_str!("./sanitize_keys_data.txt");
 
 fn main() {
-    let key_file =
-        AuthorizedKeysFile::from_str(SAMPLE_FILE).expect("that was a valid authorized_keys file!");
+    let key_file = KeysFile::from_str(SAMPLE_FILE).expect("that was a valid authorized_keys file!");
 
     println!("Before:\n{}", SAMPLE_FILE);
 
     println!(
         "After:\n{}",
-        AuthorizedKeysFile::from_iter(key_file.into_iter().flat_map(|line| match line {
-            AuthorizedKeysFileLine::Comment(_) => None,
-            AuthorizedKeysFileLine::AuthorizedKey(key) => {
-                Some(AuthorizedKeysFileLine::AuthorizedKey(key.remove_comments()))
-            }
+        KeysFile::from_iter(key_file.into_iter().flat_map(|line| match line {
+            KeysFileLine::Comment(_) => None,
+            KeysFileLine::Key(key) => Some(KeysFileLine::Key(key.remove_comments())),
         }))
     );
 }

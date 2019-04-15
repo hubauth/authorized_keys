@@ -1,8 +1,8 @@
-use super::models::*;
+use super::models::KeyAuthorization;
 #[cfg(feature = "key_encoding")]
 use data_encoding::BASE64;
 
-impl AuthorizedKey {
+impl KeyAuthorization {
     /// Mandatory components of the authorized key (type and encoded value)
     pub fn key_def(&self) -> String {
         format!("{} {}", self.key_type, self.encoded_key)
@@ -29,12 +29,13 @@ impl AuthorizedKey {
 
 #[cfg(test)]
 mod tests {
-    use super::{AuthorizedKey, AuthorizedKeyType};
+    use super::super::models::KeyType;
+    use super::KeyAuthorization;
 
     #[test]
     fn it_gets_key_def() {
-        let mut subject = AuthorizedKey::default();
-        subject.key_type = AuthorizedKeyType::EcdsaSha2Nistp256;
+        let mut subject = KeyAuthorization::default();
+        subject.key_type = KeyType::EcdsaSha2Nistp256;
         subject.encoded_key = "morevalidbase64please+==".to_owned();
 
         assert_eq!(
@@ -45,7 +46,7 @@ mod tests {
 
     #[test]
     fn it_generates_an_option_string() {
-        let mut subject = AuthorizedKey::default();
+        let mut subject = KeyAuthorization::default();
 
         subject.options = vec![
             ("option1".to_owned(), None),
@@ -65,7 +66,7 @@ mod tests {
         let data_str: &str = "MTIzNDU2Nzg=";
         let data: &[u8] = &[49, 50, 51, 52, 53, 54, 55, 56];
 
-        let mut subject = AuthorizedKey::default();
+        let mut subject = KeyAuthorization::default();
         subject.encoded_key = data_str.to_owned();
 
         assert_eq!(

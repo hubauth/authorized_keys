@@ -1,30 +1,30 @@
 use super::constants::*;
-use super::models::*;
+use super::models::{KeyAuthorization, KeyOption, KeyOptions, KeyType, KeysFile, KeysFileLine};
 use std::str::FromStr;
 
-impl FromStr for AuthorizedKeyType {
+impl FromStr for KeyType {
     type Err = ();
 
     fn from_str(s: &str) -> Result<Self, Self::Err> {
         match s.to_ascii_lowercase().as_str() {
-            ECDSA_SHA2_NISTP256 => Ok(AuthorizedKeyType::EcdsaSha2Nistp256),
-            ECDSA_SHA2_NISTP384 => Ok(AuthorizedKeyType::EcdsaSha2Nistp384),
-            ECDSA_SHA2_NISTP521 => Ok(AuthorizedKeyType::EcdsaSha2Nistp521),
-            SSH_ED25519 => Ok(AuthorizedKeyType::SshEd25519),
-            SSH_DSS => Ok(AuthorizedKeyType::SshDss),
-            SSH_RSA => Ok(AuthorizedKeyType::SshRsa),
+            ECDSA_SHA2_NISTP256 => Ok(KeyType::EcdsaSha2Nistp256),
+            ECDSA_SHA2_NISTP384 => Ok(KeyType::EcdsaSha2Nistp384),
+            ECDSA_SHA2_NISTP521 => Ok(KeyType::EcdsaSha2Nistp521),
+            SSH_ED25519 => Ok(KeyType::SshEd25519),
+            SSH_DSS => Ok(KeyType::SshDss),
+            SSH_RSA => Ok(KeyType::SshRsa),
             _ => Err(()),
         }
     }
 }
 
-struct AuthorizedKeyLinePartParser {
+struct KeyLinePartParser {
     in_quotes: bool,
     was_slash: bool,
     separator: char,
 }
 
-impl AuthorizedKeyLinePartParser {
+impl KeyLinePartParser {
     pub fn new(separator: char) -> Self {
         Self {
             in_quotes: false,
@@ -55,8 +55,8 @@ impl AuthorizedKeyLinePartParser {
     }
 }
 
-struct AuthorizedKeyLineParser {}
-impl AuthorizedKeyLineParser {
+struct KeyLineParser {}
+impl KeyLineParser {
     fn parse_option_value(input: Option<String>) -> Option<String> {
         if let Some(mut val) = input {
             if let Some(to) = val.len().checked_sub(1) {
@@ -70,7 +70,7 @@ impl AuthorizedKeyLineParser {
     }
 
     fn parse_option(input: &str) -> KeyOption {
-        let mut part_parser = AuthorizedKeyLinePartParser::new('=');
+        let mut part_parser = KeyLinePartParser::new('=');
         let mut current_part: Vec<char> = Vec::with_capacity(32);
         let mut option_name: Option<String> = None;
         let mut option_raw_value: Option<String> = None;
@@ -104,7 +104,7 @@ impl AuthorizedKeyLineParser {
     fn parse_options(input: Option<String>) -> KeyOptions {
         if let Some(options_str) = input {
             let mut chars = options_str.chars().peekable();
-            let mut part_parser = AuthorizedKeyLinePartParser::new(',');
+            let mut part_parser = KeyLinePartParser::new(',');
             let mut current_part: Vec<char> = Vec::with_capacity(128);
             let mut options = KeyOptions::default();
 
@@ -134,12 +134,12 @@ impl AuthorizedKeyLineParser {
         }
     }
 
-    fn parse(s: &str) -> Result<AuthorizedKey, String> {
+    fn parse(s: &str) -> Result<KeyAuthorization, String> {
         let mut chars = s.chars().peekable();
-        let mut part_parser = AuthorizedKeyLinePartParser::new(' ');
+        let mut part_parser = KeyLinePartParser::new(' ');
         let mut current_part: Vec<char> = Vec::with_capacity(1024);
         let mut options: Option<String> = None;
-        let mut key_type: Option<AuthorizedKeyType> = None;
+        let mut key_type: Option<KeyType> = None;
         let mut encoded_key: Option<String> = None;
         let mut comments = String::new();
 
@@ -170,7 +170,7 @@ impl AuthorizedKeyLineParser {
 
                     let part = current_part.drain(0..).collect::<String>();
 
-                    match AuthorizedKeyType::from_str(&part) {
+                    match KeyType::from_str(&part) {
                         Ok(t) => {
                             key_type = Some(t);
                         }
@@ -193,7 +193,7 @@ impl AuthorizedKeyLineParser {
 
         match key_type {
             Some(key_type) => match encoded_key {
-                Some(encoded_key) => Ok(AuthorizedKey {
+                Some(encoded_key) => Ok(KeyAuthorization {
                     options: Self::parse_options(options),
                     key_type,
                     encoded_key,
@@ -206,26 +206,26 @@ impl AuthorizedKeyLineParser {
     }
 }
 
-impl FromStr for AuthorizedKey {
+impl FromStr for KeyAuthorization {
     type Err = String;
 
     fn from_str(s: &str) -> Result<Self, Self::Err> {
-        AuthorizedKeyLineParser::parse(s)
+        KeyLineParser::parse(s)
     }
 }
 
-impl FromStr for AuthorizedKeysFile {
+impl FromStr for KeysFile {
     type Err = String;
 
     fn from_str(s: &str) -> Result<Self, Self::Err> {
-        let mut lines: Vec<AuthorizedKeysFileLine> = Vec::default();
+        let mut lines: Vec<KeysFileLine> = Vec::default();
 
         for (i, line) in s.lines().enumerate() {
             if line.starts_with('#') || line.chars().all(|c| c.is_ascii_whitespace()) {
-                lines.push(AuthorizedKeysFileLine::Comment(line.to_owned()));
+                lines.push(KeysFileLine::Comment(line.to_owned()));
             } else {
-                match AuthorizedKeyLineParser::parse(line) {
-                    Ok(key) => lines.push(AuthorizedKeysFileLine::AuthorizedKey(key)),
+                match KeyLineParser::parse(line) {
+                    Ok(key) => lines.push(KeysFileLine::Key(key)),
                     Err(e) => return Err(format!("parsing failed on line {}: {}", i, e)),
                 }
             }
@@ -244,9 +244,9 @@ mod tests {
         let key_str: &str =
             "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIGgqo1o+dOHqeIc7A5MG53s5iYwpMQm7f3hnn+uxtHUM";
 
-        let key = AuthorizedKey::from_str(key_str).expect("should parse key successfully");
+        let key = KeyAuthorization::from_str(key_str).expect("should parse key successfully");
 
-        assert_eq!(AuthorizedKeyType::SshEd25519, key.key_type);
+        assert_eq!(KeyType::SshEd25519, key.key_type);
         assert_eq!(
             "AAAAC3NzaC1lZDI1NTE5AAAAIGgqo1o+dOHqeIc7A5MG53s5iYwpMQm7f3hnn+uxtHUM",
             key.encoded_key
@@ -257,7 +257,7 @@ mod tests {
     fn it_parses_a_key_with_a_comment_through_consecutive_spaces() {
         let key_str: &str = "ssh-ed25519   AAAAtHUM   hello, world!";
 
-        let key = AuthorizedKey::from_str(key_str).expect("should parse key successfully");
+        let key = KeyAuthorization::from_str(key_str).expect("should parse key successfully");
 
         assert_eq!("hello, world!", key.comments);
     }
@@ -266,7 +266,7 @@ mod tests {
     fn it_parses_a_key_with_a_comment() {
         let key_str: &str = "ssh-ed25519 AAAAtHUM hello, world!";
 
-        let key = AuthorizedKey::from_str(key_str).expect("should parse key successfully");
+        let key = KeyAuthorization::from_str(key_str).expect("should parse key successfully");
 
         assert_eq!("hello, world!", key.comments);
     }
@@ -275,7 +275,7 @@ mod tests {
     fn it_parses_a_name_option() {
         let key_str: &str = "no-agent-forwarding ssh-ed25519 AAAAtHUM";
 
-        let key = AuthorizedKey::from_str(key_str).expect("should parse key successfully");
+        let key = KeyAuthorization::from_str(key_str).expect("should parse key successfully");
 
         assert_eq!(vec![("no-agent-forwarding".to_owned(), None)], key.options);
     }
@@ -284,7 +284,7 @@ mod tests {
     fn it_parses_a_value_option() {
         let key_str: &str = r#"command="echo hello" ssh-ed25519 AAAAtHUM"#;
 
-        let key = AuthorizedKey::from_str(key_str).expect("should parse key successfully");
+        let key = KeyAuthorization::from_str(key_str).expect("should parse key successfully");
 
         assert_eq!(
             vec![("command".to_owned(), Some("echo hello".to_owned()))],
@@ -297,7 +297,7 @@ mod tests {
         let key_str: &str =
             r#"no-agent-forwarding,command="echo \"hello\"",restrict ssh-ed25519 AAAAtHUM comment value here"#;
 
-        let key = AuthorizedKey::from_str(key_str).expect("should parse key successfully");
+        let key = KeyAuthorization::from_str(key_str).expect("should parse key successfully");
 
         assert_eq!(
             vec![
@@ -308,7 +308,7 @@ mod tests {
             key.options
         );
 
-        assert_eq!(AuthorizedKeyType::SshEd25519, key.key_type);
+        assert_eq!(KeyType::SshEd25519, key.key_type);
         assert_eq!("AAAAtHUM", key.encoded_key);
         assert_eq!("comment value here", key.comments);
     }
@@ -316,39 +316,38 @@ mod tests {
     #[test]
     fn it_parses_an_empty_keys_file() {
         let file: &str = "";
-        let expected: Vec<AuthorizedKeysFileLine> = vec![];
+        let expected: Vec<KeysFileLine> = vec![];
 
-        assert_eq!(expected, AuthorizedKeysFile::from_str(file).unwrap().lines);
+        assert_eq!(expected, KeysFile::from_str(file).unwrap().lines);
     }
 
     #[test]
     fn it_parses_an_basic_keys_file() {
         let file: &str = "ssh-ed25519 AAAAtHUM";
-        let expected: Vec<AuthorizedKeysFileLine> =
-            vec![AuthorizedKeysFileLine::AuthorizedKey(AuthorizedKey {
-                options: KeyOptions::default(),
-                key_type: AuthorizedKeyType::SshEd25519,
-                encoded_key: "AAAAtHUM".to_owned(),
-                comments: "".to_owned(),
-            })];
+        let expected: Vec<KeysFileLine> = vec![KeysFileLine::Key(KeyAuthorization {
+            options: KeyOptions::default(),
+            key_type: KeyType::SshEd25519,
+            encoded_key: "AAAAtHUM".to_owned(),
+            comments: "".to_owned(),
+        })];
 
-        assert_eq!(expected, AuthorizedKeysFile::from_str(file).unwrap().lines);
+        assert_eq!(expected, KeysFile::from_str(file).unwrap().lines);
     }
 
     #[test]
     fn it_parses_an_basic_keys_file_with_two_comment_lines() {
         let file: &str = "# hello, world!\n\nssh-ed25519 AAAAtHUM";
-        let expected: Vec<AuthorizedKeysFileLine> = vec![
-            AuthorizedKeysFileLine::Comment("# hello, world!".to_owned()),
-            AuthorizedKeysFileLine::Comment("".to_owned()),
-            AuthorizedKeysFileLine::AuthorizedKey(AuthorizedKey {
+        let expected: Vec<KeysFileLine> = vec![
+            KeysFileLine::Comment("# hello, world!".to_owned()),
+            KeysFileLine::Comment("".to_owned()),
+            KeysFileLine::Key(KeyAuthorization {
                 options: KeyOptions::default(),
-                key_type: AuthorizedKeyType::SshEd25519.to_owned(),
+                key_type: KeyType::SshEd25519.to_owned(),
                 encoded_key: "AAAAtHUM".to_owned(),
                 comments: "".to_owned(),
             }),
         ];
 
-        assert_eq!(expected, AuthorizedKeysFile::from_str(file).unwrap().lines);
+        assert_eq!(expected, KeysFile::from_str(file).unwrap().lines);
     }
 }
