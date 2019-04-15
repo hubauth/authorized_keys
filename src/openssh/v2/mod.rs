@@ -5,7 +5,6 @@ mod display;
 mod edit;
 mod get;
 mod models;
-#[cfg(feature = "parse")]
 mod parse;
 
 pub use models::*;

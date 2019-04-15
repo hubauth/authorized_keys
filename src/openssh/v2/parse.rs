@@ -1,13 +1,6 @@
 use super::constants::*;
 use super::models::*;
-use pest::error::Error;
-use pest::iterators::Pair;
-use pest::Parser;
 use std::str::FromStr;
-
-#[derive(Parser)]
-#[grammar = "openssh/v2/grammar.pest"]
-struct AuthorizedKeyParser;
 
 impl FromStr for AuthorizedKeyType {
     type Err = ();
@@ -222,93 +215,23 @@ impl FromStr for AuthorizedKey {
 }
 
 impl FromStr for AuthorizedKeysFile {
-    type Err = Error<Rule>;
+    type Err = String;
 
     fn from_str(s: &str) -> Result<Self, Self::Err> {
-        let s = if s.ends_with('\n') || s.ends_with('\r') {
-            s.to_owned()
-        } else {
-            s.to_owned() + "\n"
-        };
+        let mut lines: Vec<AuthorizedKeysFileLine> = Vec::default();
 
-        let mut pairs = AuthorizedKeyParser::parse(Rule::key_file, &s)?;
-
-        Ok(Self::from_pair(pairs.next().unwrap()))
-    }
-}
-
-impl AuthorizedKeysFile {
-    fn from_pair(root_pair: Pair<Rule>) -> Self {
-        assert!(root_pair.as_rule() == Rule::key_file);
-
-        Self {
-            lines: root_pair
-                .into_inner()
-                .flat_map(|inner_pair| match inner_pair.as_rule() {
-                    Rule::comment_line => Some(AuthorizedKeysFileLine::Comment(
-                        inner_pair.as_str().to_owned(),
-                    )),
-                    Rule::key_line => Some(AuthorizedKeysFileLine::AuthorizedKey(
-                        AuthorizedKey::from_str(inner_pair.as_str()).unwrap(),
-                    )),
-                    Rule::EOI => None,
-                    _ => unreachable!(),
-                })
-                .collect::<Vec<_>>(),
-        }
-    }
-}
-
-impl AuthorizedKey {
-    fn from_pair(root_pair: Pair<Rule>) -> Self {
-        assert!(root_pair.as_rule() == Rule::key_line);
-
-        let mut key = Self::default();
-
-        for pair in root_pair.into_inner() {
-            match pair.as_rule() {
-                Rule::options => {
-                    for option_pair in pair.into_inner() {
-                        let innards = option_pair.into_inner().collect::<Vec<_>>();
-
-                        key.options.push(match innards.len() {
-                            2 => {
-                                let quoted_val = innards[1].as_str();
-                                let inner_val = quoted_val
-                                    .chars()
-                                    .skip(1)
-                                    .take(quoted_val.len() - 2)
-                                    .collect::<String>();
-
-                                (innards[0].as_str().to_owned(), Some(inner_val))
-                            }
-                            1 => (innards[0].as_str().to_owned(), None),
-                            _ => unreachable!(),
-                        });
-                    }
+        for (i, line) in s.lines().enumerate() {
+            if line.starts_with('#') || line.chars().all(|c| c.is_ascii_whitespace()) {
+                lines.push(AuthorizedKeysFileLine::Comment(line.to_owned()));
+            } else {
+                match AuthorizedKeyLineParser::parse(line) {
+                    Ok(key) => lines.push(AuthorizedKeysFileLine::AuthorizedKey(key)),
+                    Err(e) => return Err(format!("parsing failed on line {}: {}", i, e)),
                 }
-                Rule::key => {
-                    for inner_pair in pair.into_inner() {
-                        match inner_pair.as_rule() {
-                            Rule::key_type => {
-                                key.key_type =
-                                    AuthorizedKeyType::from_str(inner_pair.as_str()).unwrap();
-                            }
-                            Rule::encoded_key => {
-                                key.encoded_key = inner_pair.as_str().to_owned();
-                            }
-                            _ => unreachable!(),
-                        }
-                    }
-                }
-                Rule::key_comment => {
-                    key.comments = pair.as_str().to_owned();
-                }
-                _ => unreachable!(),
             }
         }
 
-        key
+        Ok(Self { lines })
     }
 }
 
@@ -393,8 +316,7 @@ mod tests {
     #[test]
     fn it_parses_an_empty_keys_file() {
         let file: &str = "";
-        let expected: Vec<AuthorizedKeysFileLine> =
-            vec![AuthorizedKeysFileLine::Comment("".to_owned())];
+        let expected: Vec<AuthorizedKeysFileLine> = vec![];
 
         assert_eq!(expected, AuthorizedKeysFile::from_str(file).unwrap().lines);
     }
