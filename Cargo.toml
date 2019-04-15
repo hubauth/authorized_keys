@@ -12,13 +12,10 @@ categories = ["config", "parser-implementations"]
 license = "MIT OR Apache-2.0"
 
 [dependencies]
-pest = { version = "2.0", optional = true }
-pest_derive = { version = "2.0", optional = true }
 data-encoding = { version = "2.1", optional = true }
 
 [features]
-default = ['parse']
-parse = ['pest', 'pest_derive']
+default = []
 key_encoding = ['data-encoding']
 
 [dev-dependencies]

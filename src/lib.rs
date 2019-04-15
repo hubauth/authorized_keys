@@ -10,7 +10,4 @@
 #![deny(missing_docs)]
 #![warn(clippy::all, clippy::pedantic)]
 
-#[macro_use]
-extern crate pest_derive;
-
 pub mod openssh;
