@@ -16,14 +16,37 @@ pub type KeyOption = (String, Option<String>);
 /// `AuthorizedKey`.
 pub type KeyOptions = Vec<KeyOption>;
 
+/// Represents the key type of an authorized public key
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum AuthorizedKeyType {
+    /// `ecdsa-sha2-nistp256`
+    EcdsaSha2Nistp256,
+    /// `ecdsa-sha2-nistp384`
+    EcdsaSha2Nistp384,
+    /// `ecdsa-sha2-nistp521`
+    EcdsaSha2Nistp521,
+    /// `ssh-ed25519`
+    SshEd25519,
+    /// `ssh-dss` (for DSA)
+    SshDss,
+    /// `ssd-rsa`
+    SshRsa,
+}
+
+impl Default for AuthorizedKeyType {
+    fn default() -> Self {
+        AuthorizedKeyType::SshRsa
+    }
+}
+
 /// Represents the format of a key in an OpenSSH v2 `authorized_keys`
 /// file.
 #[derive(Debug, Default, Clone, PartialEq, Eq)]
 pub struct AuthorizedKey {
     /// Options applied to the key
     pub options: KeyOptions,
-    /// Type of key (e.g. `ssh-rsa`)
-    pub key_type: String,
+    /// Type of key (e.g. `ssh-rsa` -> `AuthorizedKeyType::SshRsa`)
+    pub key_type: AuthorizedKeyType,
     /// Public key, base64 encoded
     pub encoded_key: String,
     /// Comments written at the end of the `authorized_keys` line

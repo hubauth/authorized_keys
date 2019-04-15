@@ -71,7 +71,7 @@ impl AuthorizedKey {
     }
 
     /// Sets the key type to the provided value.
-    pub fn key_type(mut self, val: String) -> Self {
+    pub fn key_type(mut self, val: AuthorizedKeyType) -> Self {
         self.key_type = val;
 
         self
@@ -94,7 +94,7 @@ impl AuthorizedKey {
 
 #[cfg(test)]
 mod tests {
-    use super::AuthorizedKey;
+    use super::{AuthorizedKey, AuthorizedKeyType};
 
     #[test]
     fn it_adds_options() {
@@ -111,23 +111,19 @@ mod tests {
 
         assert_eq!(
             &subject.to_string(),
-            r#"command="echo \"hello, world!\"",baz,command="echo \"goodbye, world!\""  "#
+            r#"command="echo \"hello, world!\"",baz,command="echo \"goodbye, world!\"" ssh-rsa "#
         )
     }
 
     #[test]
     fn it_removes_options() {
-        let subject = AuthorizedKey {
-            options: vec![
-                ("foo".to_owned(), Some("bar".to_owned())),
-                ("foo".to_owned(), Some("baz".to_owned())),
-                ("foo".to_owned(), None),
-                ("quz".to_owned(), None),
-            ],
-            key_type: "".to_owned(),
-            encoded_key: "".to_owned(),
-            comments: "".to_owned(),
-        };
+        let mut subject = AuthorizedKey::default();
+        subject.options = vec![
+            ("foo".to_owned(), Some("bar".to_owned())),
+            ("foo".to_owned(), Some("baz".to_owned())),
+            ("foo".to_owned(), None),
+            ("quz".to_owned(), None),
+        ];
 
         assert_eq!(1, subject.clone().remove_named_options("foo").options.len());
         assert_eq!(
@@ -167,10 +163,10 @@ mod tests {
     #[test]
     fn it_sets_key_parameters() {
         let subject = AuthorizedKey::default()
-            .key_type("ssh-rsa".to_owned())
+            .key_type(AuthorizedKeyType::SshRsa)
             .encoded_key("thisisvalidbase64/==".to_owned());
 
-        assert_eq!("ssh-rsa", subject.key_type);
+        assert_eq!(AuthorizedKeyType::SshRsa, subject.key_type);
         assert_eq!("thisisvalidbase64/==", subject.encoded_key);
     }
 

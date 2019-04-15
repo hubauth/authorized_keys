@@ -1,3 +1,4 @@
+use super::constants::*;
 use super::models::*;
 use pest::error::Error;
 use pest::iterators::Pair;
@@ -31,6 +32,22 @@ impl FromStr for AuthorizedKeysFile {
         let mut pairs = AuthorizedKeyParser::parse(Rule::key_file, &s)?;
 
         Ok(Self::from_pair(pairs.next().unwrap()))
+    }
+}
+
+impl FromStr for AuthorizedKeyType {
+    type Err = ();
+
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        match s.to_ascii_lowercase().as_str() {
+            ECDSA_SHA2_NISTP256 => Ok(AuthorizedKeyType::EcdsaSha2Nistp256),
+            ECDSA_SHA2_NISTP384 => Ok(AuthorizedKeyType::EcdsaSha2Nistp384),
+            ECDSA_SHA2_NISTP521 => Ok(AuthorizedKeyType::EcdsaSha2Nistp521),
+            SSH_ED25519 => Ok(AuthorizedKeyType::SshEd25519),
+            SSH_DSS => Ok(AuthorizedKeyType::SshDss),
+            SSH_RSA => Ok(AuthorizedKeyType::SshRsa),
+            _ => Err(()),
+        }
     }
 }
 
@@ -88,7 +105,8 @@ impl AuthorizedKey {
                     for inner_pair in pair.into_inner() {
                         match inner_pair.as_rule() {
                             Rule::key_type => {
-                                key.key_type = inner_pair.as_str().to_owned();
+                                key.key_type =
+                                    AuthorizedKeyType::from_str(inner_pair.as_str()).unwrap();
                             }
                             Rule::encoded_key => {
                                 key.encoded_key = inner_pair.as_str().to_owned();
@@ -119,7 +137,7 @@ mod tests {
 
         let key = AuthorizedKey::from_str(key_str).expect("should parse key successfully");
 
-        assert_eq!("ssh-ed25519", key.key_type);
+        assert_eq!(AuthorizedKeyType::SshEd25519, key.key_type);
         assert_eq!(
             "AAAAC3NzaC1lZDI1NTE5AAAAIGgqo1o+dOHqeIc7A5MG53s5iYwpMQm7f3hnn+uxtHUM",
             key.encoded_key
@@ -172,7 +190,7 @@ mod tests {
             key.options
         );
 
-        assert_eq!("ssh-ed25519", key.key_type);
+        assert_eq!(AuthorizedKeyType::SshEd25519, key.key_type);
         assert_eq!("AAAAtHUM", key.encoded_key);
         assert_eq!("comment value here", key.comments);
     }
@@ -192,7 +210,7 @@ mod tests {
         let expected: Vec<AuthorizedKeysFileLine> =
             vec![AuthorizedKeysFileLine::AuthorizedKey(AuthorizedKey {
                 options: KeyOptions::default(),
-                key_type: "ssh-ed25519".to_owned(),
+                key_type: AuthorizedKeyType::SshEd25519,
                 encoded_key: "AAAAtHUM".to_owned(),
                 comments: "".to_owned(),
             })];
@@ -208,7 +226,7 @@ mod tests {
             AuthorizedKeysFileLine::Comment("".to_owned()),
             AuthorizedKeysFileLine::AuthorizedKey(AuthorizedKey {
                 options: KeyOptions::default(),
-                key_type: "ssh-ed25519".to_owned(),
+                key_type: AuthorizedKeyType::SshEd25519.to_owned(),
                 encoded_key: "AAAAtHUM".to_owned(),
                 comments: "".to_owned(),
             }),
