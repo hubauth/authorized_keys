@@ -1,13 +1,8 @@
-use super::models::*;
+use super::models::{KeyAuthorization, PublicKey};
 #[cfg(feature = "key_encoding")]
 use data_encoding::BASE64;
 
-impl AuthorizedKey {
-    /// Mandatory components of the authorized key (type and encoded value)
-    pub fn key_def(&self) -> String {
-        format!("{} {}", self.key_type, self.encoded_key)
-    }
-
+impl KeyAuthorization {
     /// Key options, formatted in the `authorized_keys` compatible manner.
     pub fn options_string(&self) -> String {
         self.options
@@ -19,33 +14,23 @@ impl AuthorizedKey {
             .collect::<Vec<_>>()
             .join(",")
     }
+}
 
+impl PublicKey {
     #[cfg(feature = "key_encoding")]
     /// Public key, decoded into bytes.
-    pub fn key_bytes(&self) -> Result<Vec<u8>, data_encoding::DecodeError> {
+    pub fn data_bytes(&self) -> Result<Vec<u8>, data_encoding::DecodeError> {
         BASE64.decode(self.encoded_key.as_bytes())
     }
 }
 
 #[cfg(test)]
 mod tests {
-    use super::{AuthorizedKey, AuthorizedKeyType};
-
-    #[test]
-    fn it_gets_key_def() {
-        let mut subject = AuthorizedKey::default();
-        subject.key_type = AuthorizedKeyType::EcdsaSha2Nistp256;
-        subject.encoded_key = "morevalidbase64please+==".to_owned();
-
-        assert_eq!(
-            "ecdsa-sha2-nistp256 morevalidbase64please+==",
-            subject.key_def()
-        )
-    }
+    use super::KeyAuthorization;
 
     #[test]
     fn it_generates_an_option_string() {
-        let mut subject = AuthorizedKey::default();
+        let mut subject = KeyAuthorization::default();
 
         subject.options = vec![
             ("option1".to_owned(), None),
@@ -65,12 +50,12 @@ mod tests {
         let data_str: &str = "MTIzNDU2Nzg=";
         let data: &[u8] = &[49, 50, 51, 52, 53, 54, 55, 56];
 
-        let mut subject = AuthorizedKey::default();
-        subject.encoded_key = data_str.to_owned();
+        let mut subject = KeyAuthorization::default();
+        subject.key.encoded_key = data_str.to_owned();
 
         assert_eq!(
             data.to_vec(),
-            subject.key_bytes().expect("decoding should succeed")
+            subject.key.data_bytes().expect("decoding should succeed")
         );
     }
 }

@@ -2,7 +2,7 @@
 extern crate criterion;
 extern crate authorized_keys;
 
-use authorized_keys::openssh::v2::{AuthorizedKey, AuthorizedKeysFile};
+use authorized_keys::openssh::v2::{KeyAuthorization, KeysFile};
 use std::str::FromStr;
 
 use criterion::{black_box, Criterion};
@@ -12,13 +12,13 @@ const TEST_LINE: &str = r#"no-agent-forwarding,command="echo \"Hello, world!\"" 
 
 fn file_benchmark(c: &mut Criterion) {
     c.bench_function("parse file", |b| {
-        b.iter(|| black_box(AuthorizedKeysFile::from_str(black_box(TEST_FILE)).unwrap()))
+        b.iter(|| black_box(KeysFile::from_str(black_box(TEST_FILE)).unwrap()))
     });
 }
 
 fn line_benchmark(c: &mut Criterion) {
     c.bench_function("parse line", |b| {
-        b.iter(|| black_box(AuthorizedKey::from_str(black_box(TEST_LINE)).unwrap()))
+        b.iter(|| black_box(KeyAuthorization::from_str(black_box(TEST_LINE)).unwrap()))
     });
 }
 
