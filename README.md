@@ -8,6 +8,7 @@ Parse and manipulate OpenSSH `authorized_keys` files.
 
   [Contributing](./CONTRIBUTING.md)
 | [Code of Conduct](./CODE_OF_CONDUCT.md)
+| [Changelog](./CHANGELOG.md)
 | [Examples](./examples/)
 
 ## Installation

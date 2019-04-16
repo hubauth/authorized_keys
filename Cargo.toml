@@ -1,6 +1,6 @@
 [package]
 name = "authorized_keys"
-version = "0.9.0"
+version = "0.10.0"
 authors = ["Liam Dawson <liam@ldaws.com>"]
 edition = "2018"
 description = "Parse and manipulate OpenSSH `authorized_keys` files"
@@ -10,6 +10,11 @@ readme = "README.md"
 keywords = ["openssh", "authorized_keys"]
 categories = ["config", "parser-implementations"]
 license = "MIT OR Apache-2.0"
+
+[badges]
+travis-ci = { repository = "hubauth/authorized_keys" }
+is-it-maintained-open-issues = { repository = "hubauth/authorized_keys" }
+maintenance = { status = "experimental" }
 
 [dependencies]
 data-encoding = { version = "2.1", optional = true }
