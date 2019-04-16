@@ -16,7 +16,7 @@ Parse and manipulate OpenSSH `authorized_keys` files.
 `Cargo.toml`:
 
 ```toml
-[features]
+[dependencies]
 authorized_keys = "0.9"
 ```
 
