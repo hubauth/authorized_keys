@@ -239,6 +239,10 @@ impl FromStr for KeysFile {
 mod tests {
     use super::*;
 
+    fn key_option(name: &str, val: Option<&str>) -> KeyOption {
+        (name.to_owned(), val.map(std::string::ToString::to_string))
+    }
+
     #[test]
     fn it_parses_a_minimal_key() {
         let key_str: &str =
@@ -301,9 +305,9 @@ mod tests {
 
         assert_eq!(
             vec![
-                ("no-agent-forwarding".to_owned(), None),
-                ("command".to_owned(), Some(r#"echo \"hello\""#.to_owned())),
-                ("restrict".to_owned(), None),
+                key_option("no-agent-forwarding", None),
+                key_option("command", Some(r#"echo \"hello\""#)),
+                key_option("restrict", None)
             ],
             key.options
         );
@@ -311,6 +315,19 @@ mod tests {
         assert_eq!(KeyType::SshEd25519, key.key.key_type);
         assert_eq!("AAAAtHUM", key.key.encoded_key);
         assert_eq!("comment value here", key.comments);
+    }
+
+    #[test]
+    fn it_parses_with_empty_option_value() {
+        let key_str = r#"command="" ssh-rsa AAAAtHUM"#;
+        let expected = vec![key_option("command", Some(""))];
+
+        assert_eq!(
+            expected,
+            KeyAuthorization::parse(key_str)
+                .expect("failed to parse valid key line")
+                .options
+        );
     }
 
     #[test]
