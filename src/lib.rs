@@ -11,3 +11,4 @@
 #![warn(clippy::all, clippy::pedantic)]
 
 pub mod openssh;
+mod string_enum;

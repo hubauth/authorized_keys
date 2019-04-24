@@ -1,24 +1,7 @@
-use super::constants::*;
 use super::models::{
     KeyAuthorization, KeyOption, KeyOptions, KeyType, KeysFile, KeysFileLine, PublicKey,
 };
 use std::str::FromStr;
-
-impl FromStr for KeyType {
-    type Err = ();
-
-    fn from_str(s: &str) -> Result<Self, Self::Err> {
-        match s.to_ascii_lowercase().as_str() {
-            ECDSA_SHA2_NISTP256 => Ok(KeyType::EcdsaSha2Nistp256),
-            ECDSA_SHA2_NISTP384 => Ok(KeyType::EcdsaSha2Nistp384),
-            ECDSA_SHA2_NISTP521 => Ok(KeyType::EcdsaSha2Nistp521),
-            SSH_ED25519 => Ok(KeyType::SshEd25519),
-            SSH_DSS => Ok(KeyType::SshDss),
-            SSH_RSA => Ok(KeyType::SshRsa),
-            _ => Err(()),
-        }
-    }
-}
 
 struct KeyLinePartParser {
     in_quotes: bool,
