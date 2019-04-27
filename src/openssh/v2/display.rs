@@ -1,23 +1,5 @@
-use super::constants::*;
-use super::models::{KeyAuthorization, KeyType, KeysFile, KeysFileLine, PublicKey};
+use super::models::{KeyAuthorization, KeysFile, KeysFileLine, PublicKey};
 use std::fmt::{Display, Error, Formatter};
-
-impl Display for KeyType {
-    fn fmt(&self, f: &mut Formatter) -> Result<(), Error> {
-        write!(
-            f,
-            "{}",
-            match self {
-                KeyType::EcdsaSha2Nistp256 => ECDSA_SHA2_NISTP256,
-                KeyType::EcdsaSha2Nistp384 => ECDSA_SHA2_NISTP384,
-                KeyType::EcdsaSha2Nistp521 => ECDSA_SHA2_NISTP521,
-                KeyType::SshEd25519 => SSH_ED25519,
-                KeyType::SshDss => SSH_DSS,
-                KeyType::SshRsa => SSH_RSA,
-            }
-        )
-    }
-}
 
 impl Display for PublicKey {
     fn fmt(&self, f: &mut Formatter) -> Result<(), Error> {
@@ -56,7 +38,8 @@ impl Display for KeysFile {
 
 #[cfg(test)]
 mod tests {
-    use super::{KeyAuthorization, KeyType, PublicKey};
+    use super::super::constants::KeyType;
+    use super::{KeyAuthorization, PublicKey};
 
     #[test]
     fn it_writes_a_key() {
