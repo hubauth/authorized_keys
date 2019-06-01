@@ -4,7 +4,7 @@ Particularly welcomed:
 
 * Test cases (especially failing ones)
 * Enhanced testing
-* Improvements to the way [pest] is used
+* Improvements to the way `nom` is used
 
 ## Requirements
 
@@ -22,5 +22,4 @@ Particularly welcomed:
 1. Open a PR for the changes
     * Add yourself as an author to `Cargo.toml` and `README.md`, if you'd like!
 
-[pest]: https://pest.rs
 [rustup]: https://rustup.rs/

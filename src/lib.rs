@@ -10,5 +10,9 @@
 #![deny(missing_docs)]
 #![warn(clippy::all, clippy::pedantic)]
 
+extern crate nom;
+
 pub mod openssh;
 mod string_enum;
+#[cfg(test)]
+pub(crate) mod testing;

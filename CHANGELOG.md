@@ -7,6 +7,10 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 ---
 
+### Changes
+
+* Replaced hand-written parser with `nom 5.0.0-beta2` parser, improving
+  readability and parsing speed. [#7]
 
 ## [0.10.0] - (2019-04-16)
 
@@ -36,3 +40,4 @@ Initial release.
 [#2]: https://github.com/hubauth/authorized_keys/pull/2
 [#3]: https://github.com/hubauth/authorized_keys/pull/3
 [#4]: https://github.com/hubauth/authorized_keys/pull/4
+[#7]: https://github.com/hubauth/authorized_keys/pull/7

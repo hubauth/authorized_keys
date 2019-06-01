@@ -1,6 +1,6 @@
 [package]
 name = "authorized_keys"
-version = "0.10.0"
+version = "0.11.0"
 authors = ["Liam Dawson <liam@ldaws.com>"]
 edition = "2018"
 description = "Parse and manipulate OpenSSH `authorized_keys` files"
@@ -17,6 +17,7 @@ is-it-maintained-open-issues = { repository = "hubauth/authorized_keys" }
 maintenance = { status = "experimental" }
 
 [dependencies]
+nom = "5.0.0-beta2"
 data-encoding = { version = "2.1", optional = true }
 
 [features]
@@ -25,6 +26,7 @@ key_encoding = ['data-encoding']
 
 [dev-dependencies]
 criterion = "0.2"
+spectral = "0.6.0"
 
 [[bench]]
 name = "parsing"
