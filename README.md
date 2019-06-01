@@ -17,7 +17,7 @@ Parse and manipulate OpenSSH `authorized_keys` files.
 
 ```toml
 [dependencies]
-authorized_keys = "0.9"
+authorized_keys = "0.11"
 ```
 
 ## Features
@@ -27,16 +27,18 @@ authorized_keys = "0.9"
 * Change the parts of a line (options, key type, encoded key, comments)
   with convenience methods
 * Write `authorized_keys` files in the correct format
-* No dependencies by default
-  * Depends on [`data-encoding`] if you want to edit key data as bytes
+* One dependency by default (`nom`)
+  * Also depends on [`data-encoding`] if you want to edit key data as
+    bytes using convenience methods
 
 ## Roadmap
 
 ### 1.0
 
-* [ ] more significant testing
+* [x] individual parsing parts tested
 * [x] benchmarks
-* [ ] validated benchmarks
+* [x] examples
+* [ ] release/stable build of `nom` (current `5.0.0-beta2`)
 
 ## Authors
 
