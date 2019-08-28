@@ -1,7 +1,7 @@
 use nom::branch::alt;
-use nom::bytes::complete::{escaped, is_a, is_not, take, take_while1};
+use nom::bytes::complete::{escaped, is_a, is_not, take, take_while1, tag};
 use nom::character::complete::{anychar, char, space0};
-use nom::combinator::recognizec;
+use nom::combinator::{recognizec, value};
 use nom::error::{ErrorKind, ParseError};
 use nom::multi::count;
 use nom::sequence::{delimitedc, pairc};
@@ -34,12 +34,15 @@ pub(crate) fn identifier(input: &str) -> IResult<&str, &str> {
 
 /// Parse an escapable string.
 pub(crate) fn string(input: &str) -> IResult<&str, &str> {
-    delimitedc(
-        input,
-        char('"'),
-        escaped(is_not(r#"\""#), '\\', anychar),
-        char('"'),
-    )
+    alt((
+        value("", tag(r#""""#)),
+        |inner| delimitedc(
+            inner,
+            char('"'),
+            escaped(is_not(r#"\""#), '\\', anychar),
+            char('"'),
+        )
+    ))(input)
 }
 
 /// Indicates whether the character is a valid base64 body character.
