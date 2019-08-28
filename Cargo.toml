@@ -17,7 +17,7 @@ is-it-maintained-open-issues = { repository = "hubauth/authorized_keys" }
 maintenance = { status = "experimental" }
 
 [dependencies]
-nom = "5.0.0-beta2"
+nom = "5.0"
 data-encoding = { version = "2.1", optional = true }
 
 [features]
@@ -25,8 +25,8 @@ default = []
 key_encoding = ['data-encoding']
 
 [dev-dependencies]
-criterion = "0.2"
-spectral = "0.6.0"
+criterion = "0.3"
+spectral = "0.6"
 
 [[bench]]
 name = "parsing"
