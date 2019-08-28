@@ -7,7 +7,9 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 ---
 
-## [0.11.0] - (2019-06-01)
+## [1.0.0] - (2019-08-28)
+
+* Upgrade to stable version 5 of nom
 
 ---
 
