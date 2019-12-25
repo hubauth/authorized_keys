@@ -5,6 +5,8 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 ## [Unreleased]
 
+* Fix clippy warnings against nightly
+
 ---
 
 ## [1.0.0] - (2019-08-28)

@@ -1,6 +1,6 @@
 [package]
 name = "authorized_keys"
-version = "1.0.0"
+version = "1.0.1"
 authors = ["Liam Dawson <liam@ldaws.com>"]
 edition = "2018"
 description = "Parse and manipulate OpenSSH `authorized_keys` files"

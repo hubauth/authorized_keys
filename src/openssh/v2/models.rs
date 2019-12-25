@@ -28,6 +28,7 @@ pub struct PublicKey {
 }
 
 impl PublicKey {
+    #[must_use]
     /// Create a representation of a public key
     pub fn new(key_type: KeyType, encoded_key: String) -> Self {
         Self {

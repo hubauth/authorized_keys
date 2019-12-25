@@ -29,6 +29,7 @@ macro_rules! string_enum {
 
         impl $enum_name {
             /// Keys from the enum, in the order they were defined
+            #[must_use]
             pub fn enum_values() -> Vec<Self> {
                 vec![
                     $($enum_name::$name,)+
@@ -37,6 +38,7 @@ macro_rules! string_enum {
 
             /// String values for the keys in the enum, in the order
             /// they were defined
+            #[must_use]
             pub fn string_values() -> Vec<String> {
                 Self::enum_values()
                     .iter()
@@ -45,6 +47,7 @@ macro_rules! string_enum {
             }
 
             /// Keys and values from the enum, as paired tuples.
+            #[must_use]
             pub fn name_value_pairs() -> Vec<(Self, String)> {
                 Self::enum_values()
                     .into_iter()
