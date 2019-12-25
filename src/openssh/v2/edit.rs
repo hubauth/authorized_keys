@@ -3,12 +3,13 @@ use super::models::{KeyAuthorization, KeyOption, KeyType, PublicKey};
 use data_encoding::BASE64;
 
 fn basic_escape(val: &str) -> String {
-    val.replace("\\", "\\\\").replace("\"", "\\\"").to_owned()
+    val.replace("\\", "\\\\").replace("\"", "\\\"")
 }
 
 impl KeyAuthorization {
     /// Adds a `KeyOption` to the key's options, without escaping the
     /// value.
+    #[must_use]
     pub fn raw_option(mut self, option: KeyOption) -> Self {
         self.options.push(option);
 
@@ -17,17 +18,20 @@ impl KeyAuthorization {
 
     /// Adds a `KeyOption` to the key's options, escaping any
     /// double-quotes and slashes. Does not avoid double-escapes.
+    #[must_use]
     pub fn option(self, option: KeyOption) -> Self {
         self.raw_option((option.0, option.1.map(|v| basic_escape(&v))))
     }
 
     /// Adds a `KeyOption` to the key's option, where the option is
     /// (`name`, None).
+    #[must_use]
     pub fn option_name(self, name: String) -> Self {
         self.raw_option((name, None))
     }
 
     /// Removes all options from the key.
+    #[must_use]
     pub fn clear_options(mut self) -> Self {
         self.options.truncate(0);
 
@@ -35,6 +39,7 @@ impl KeyAuthorization {
     }
 
     /// Removes all options with the given option name.
+    #[must_use]
     pub fn remove_named_options(mut self, name: &str) -> Self {
         self.options = self
             .options
@@ -46,6 +51,7 @@ impl KeyAuthorization {
     }
 
     /// Remove all options with the given name and value.
+    #[must_use]
     pub fn remove_options(mut self, option: &KeyOption) -> Self {
         self.options = self
             .options
@@ -57,6 +63,7 @@ impl KeyAuthorization {
     }
 
     /// Removes the comments field for the key.
+    #[must_use]
     pub fn remove_comments(mut self) -> Self {
         self.comments = "".to_owned();
 
@@ -64,6 +71,7 @@ impl KeyAuthorization {
     }
 
     /// Sets the comments field to the provided value.
+    #[must_use]
     pub fn comments(mut self, val: String) -> Self {
         self.comments = val;
 
@@ -71,6 +79,7 @@ impl KeyAuthorization {
     }
 
     /// Sets the public key to the provided value.
+    #[must_use]
     pub fn key(mut self, key: PublicKey) -> Self {
         self.key = key;
 
@@ -78,6 +87,7 @@ impl KeyAuthorization {
     }
 
     /// Sets the key type to the provided value.
+    #[must_use]
     pub fn key_type(mut self, val: KeyType) -> Self {
         self.key.key_type = val;
 
@@ -85,6 +95,7 @@ impl KeyAuthorization {
     }
 
     /// Sets the encoded key to the provided value.
+    #[must_use]
     pub fn encoded_key(mut self, val: String) -> Self {
         self.key.encoded_key = val;
 
@@ -93,6 +104,7 @@ impl KeyAuthorization {
 
     /// Sets the public key data to the encoded form of the given bytes.
     #[cfg(feature = "key_encoding")]
+    #[must_use]
     pub fn key_data_from_bytes(mut self, bytes: &[u8]) -> Self {
         self.key.encoded_key = BASE64.encode(bytes);
 
@@ -102,6 +114,7 @@ impl KeyAuthorization {
 
 impl PublicKey {
     /// Sets the encoded key to the provided value.
+    #[must_use]
     pub fn encoded_key(mut self, val: String) -> Self {
         self.encoded_key = val;
 
@@ -109,6 +122,7 @@ impl PublicKey {
     }
 
     /// Sets the key type to the provided value.
+    #[must_use]
     pub fn key_type(mut self, val: KeyType) -> Self {
         self.key_type = val;
 
@@ -117,6 +131,7 @@ impl PublicKey {
 
     /// Sets the encoded key to the base64 representation of the given
     /// bytes.
+    #[must_use]
     #[cfg(feature = "key_encoding")]
     pub fn data_from_bytes(mut self, bytes: &[u8]) -> Self {
         self.encoded_key = BASE64.encode(bytes);
@@ -178,7 +193,6 @@ mod tests {
         assert_eq!(
             4,
             subject
-                .clone()
                 .remove_options(&("foo".to_owned(), Some("miss".to_owned())))
                 .options
                 .len()

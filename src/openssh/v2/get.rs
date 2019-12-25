@@ -3,6 +3,7 @@ use super::models::{KeyAuthorization, PublicKey};
 use data_encoding::BASE64;
 
 impl KeyAuthorization {
+    #[must_use]
     /// Key options, formatted in the `authorized_keys` compatible manner.
     pub fn options_string(&self) -> String {
         self.options
@@ -19,6 +20,10 @@ impl KeyAuthorization {
 impl PublicKey {
     #[cfg(feature = "key_encoding")]
     /// Public key, decoded into bytes.
+    ///
+    /// # Errors
+    ///
+    /// Returns an error if the key was invalid base64.
     pub fn data_bytes(&self) -> Result<Vec<u8>, data_encoding::DecodeError> {
         BASE64.decode(self.encoded_key.as_bytes())
     }

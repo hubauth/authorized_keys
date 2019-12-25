@@ -37,13 +37,7 @@ impl FromStr for KeysFile {
                 } else {
                     match line.parse() {
                         Ok(authorization) => KeysFileLine::Key(authorization),
-                        Err(e) => {
-                            return Err(format!(
-                                "failed to parse line {}: {}",
-                                line_no,
-                                e.to_string()
-                            ))
-                        }
+                        Err(e) => return Err(format!("failed to parse line {}: {}", line_no, e)),
                     }
                 },
             );

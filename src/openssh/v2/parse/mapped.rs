@@ -25,7 +25,7 @@ pub(crate) fn key_options(input: &str) -> IResult<&str, KeyOptions> {
 
     let mapped_options = parsed_options
         .iter()
-        .map(|(name, val)| (name.to_string(), val.map(ToOwned::to_owned)))
+        .map(|(name, val)| ((*name).to_string(), val.map(ToOwned::to_owned)))
         .collect();
 
     Ok((input, mapped_options))
