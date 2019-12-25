@@ -2,8 +2,8 @@
 
 Parse and manipulate OpenSSH `authorized_keys` files.
 
-[![Windows Build Status](https://ci.appveyor.com/api/projects/status/gm7dto6llk0mgrsr?svg=true)](https://ci.appveyor.com/project/liamdawson/authorized-keys)
-[![Build Status](https://travis-ci.com/hubauth/authorized_keys.svg?branch=master)](https://travis-ci.com/hubauth/authorized_keys)
+[![Linting Status](https://github.com/hubauth/authorized_keys/workflows/Lint/badge.svg)](https://github.com/hubauth/authorized_keys/actions?query=workflow%3ALint)
+[![Test Suite Status](https://github.com/hubauth/authorized_keys/workflows/Test/badge.svg)](https://github.com/hubauth/authorized_keys/actions?query=workflow%3ATest)
 [![Crates.io](https://img.shields.io/crates/v/authorized_keys.svg)](https://crates.io/crates/authorized_keys)
 
   [Contributing](./CONTRIBUTING.md)
@@ -30,6 +30,7 @@ authorized_keys = "1.0"
 * One dependency by default (`nom`)
   * Depends on [`data-encoding`] if you want to edit key data as bytes using
     convenience methods
+* Minimum rust version 1.34.2 (supports Debian Buster)
 
 ## Authors
 
