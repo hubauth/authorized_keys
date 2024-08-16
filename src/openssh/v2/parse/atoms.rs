@@ -15,9 +15,10 @@ pub(crate) fn whitespace(input: &str) -> IResult<&str, &str> {
 /// Parse an identifier from the start of the input.
 ///
 /// An identifier begins with an alphabetic character, ends with an alphanumeric
-/// character, and can have alphanumeric characters (or dashes) in the middle.
+/// character, and can have alphanumeric characters (or certain punctuation marks) in the middle.
 pub(crate) fn identifier(input: &str) -> IResult<&str, &str> {
-    let res = take_while1(|c: char| c.is_alphanumeric() || c == '-')(input)?;
+    let res =
+        take_while1(|c: char| c.is_alphanumeric() || c == '-' || c == '@' || c == '.')(input)?;
 
     let first_char = res.1.chars().nth(0).unwrap();
     let last_char = res.1.chars().last().unwrap();
